@@ -20,15 +20,15 @@ public:
     //连接数据库
     bool connect(std::string host, std::string user, std::string passwd, std::string database);
     //插入数据
-    bool insertValues(std::string tablename, char values[]);
+    bool insertValues(std::string sql);
     //删除数据
-    bool delValues(std::string tablename, std::string clounmname, std::string keyname);
+    bool delValues(std::string sql);
     //查询数据
     bool searchValues(std::string sql);
     //查询数据
     MYSQL_RES *searchValuesToRes(std::string sql);
     //修改数据
-    bool updateValues(std::string tablename, std::string updatename, std::string values, std::string clounmname, std::string keyname);
+    bool updateValues(std::string sql);
 
 public:
     static MyDB *getInstance();

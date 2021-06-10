@@ -38,9 +38,37 @@ bool MyDB::connect(std::string host, std::string user, std::string passwd, std::
 }
 
 //插入数据
-bool MyDB::insertValues(std::string tablename, char values[]) { return false; }
+bool MyDB::insertValues(std::string sql)
+{
+    int res = mysql_query(mysql, sql.c_str());
+    if (res == 0)
+    {
+        std::cout << "insertValues successed!" << std::endl;
+        return true;
+    }
+    else
+    {
+        std::cout << "insertValues failed!" << std::endl;
+        return false;
+    }
+    return false;
+}
 //删除数据
-bool MyDB::delValues(std::string tablename, std::string clounmname, std::string keyname) { return false; }
+bool MyDB::delValues(std::string sql)
+{
+    int res = mysql_query(mysql, sql.c_str());
+    if (res == 0)
+    {
+        std::cout << "delValues successed!" << std::endl;
+        return true;
+    }
+    else
+    {
+        std::cout << "delValues failed!" << std::endl;
+        return false;
+    }
+    return false;
+}
 //查询数据
 bool MyDB::searchValues(std::string sql)
 {
@@ -78,8 +106,19 @@ bool MyDB::searchValues(std::string sql)
     return false;
 }
 //修改数据
-bool MyDB::updateValues(std::string tablename, std::string updatename, std::string values, std::string clounmname, std::string keyname)
+bool MyDB::updateValues(std::string sql)
 {
+    int res = mysql_query(mysql, sql.c_str());
+    if (res == 0)
+    {
+        std::cout << "updateValues successed!" << std::endl;
+        return true;
+    }
+    else
+    {
+        std::cout << "updateValues failed!" << std::endl;
+        return false;
+    }
     return false;
 }
 
