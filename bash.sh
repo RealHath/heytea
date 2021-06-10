@@ -1,0 +1,1 @@
+g++ -o main main.cpp sql.cpp -I /usr/local/include/ -L /usr/local/lib/ -l event -l mysqlclient -l cjson -g -Wall -std=c++11 -Wno-unused-parameter -O3
