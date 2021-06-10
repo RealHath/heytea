@@ -1,22 +1,6 @@
 #include "main.h"
 #include "sql.h"
-
-int code_convert(char *inbuf, int inlen, char *outbuf, int outlen)
-{
-    iconv_t cd;
-    int rc;
-    char **pin = &inbuf;
-    char **pout = &outbuf;
-
-    cd = iconv_open("UTF-8", "GB2312");
-    if (cd == 0)
-        return -1;
-    memset(outbuf, 0, outlen);
-    if (iconv(cd, pin, &inlen, pout, &outlen) == -1)
-        return -1;
-    iconv_close(cd);
-    return 0;
-}
+#include <unistd.h>
 
 //解析post请求数据
 void get_post_message(std::string &buf, struct evhttp_request *req)
@@ -56,12 +40,13 @@ void login(evhttp_request *req, void *arg)
     //响应的buffer
     struct evbuffer *retbuff = evbuffer_new();
     cJSON *monitor = cJSON_CreateObject();
-
+    evkeyvalq *outhead = evhttp_request_get_output_headers(req);
+    evhttp_add_header(outhead, "Content-Type", "application/json;charset=UTF-8");
     //请求数据格式错误
     cJSON *json = cJSON_Parse(buf.c_str());
     if (!json)
     {
-        cJSON_AddItemToObject(monitor, "data", nullptr);
+        cJSON_AddObjectToObject(monitor, "data");
         cJSON_AddStringToObject(monitor, "msg", "数据格式错误");
         cJSON_AddNullToObject(monitor, "systemCode");
         cJSON_AddNumberToObject(monitor, "statusCode", 400);
@@ -108,7 +93,7 @@ void login(evhttp_request *req, void *arg)
     //查询结果错误
     else
     {
-        cJSON_AddItemToObject(monitor, "data", nullptr);
+        cJSON_AddObjectToObject(monitor, "data");
         cJSON_AddStringToObject(monitor, "msg", "查询结果为空");
         cJSON_AddNullToObject(monitor, "systemCode");
         cJSON_AddNumberToObject(monitor, "statusCode", 200);
@@ -120,6 +105,10 @@ void login(evhttp_request *req, void *arg)
     cJSON_free(monitor);
     cJSON_free(username);
     cJSON_free(password);
+}
+
+void resetPasswod(evhttp_request *req, void *arg)
+{
 }
 
 void page404(evhttp_request *req, void *arg)
@@ -138,6 +127,7 @@ void page404(evhttp_request *req, void *arg)
 
 int main()
 {
+    daemon(0, 0);
     MyDB::getInstance()->connect("10.3.35.247", "root", "rootrootroot", "heytea");
     struct evhttp *http_server = nullptr;
     //初始化
@@ -155,6 +145,7 @@ int main()
     //区别于evhttp_set_gencb函数，是对所有请求设置一个统一的处理函数
     evhttp_set_gencb(http_server, page404, nullptr);
     evhttp_set_cb(http_server, "/api/login/login", login, nullptr);
+    evhttp_set_cb(http_server, "/api/login/resetPasswod", resetPasswod, nullptr);
 
     //循环监听
     event_dispatch();
